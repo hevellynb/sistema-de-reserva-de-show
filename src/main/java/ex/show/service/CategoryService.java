@@ -45,9 +45,12 @@ public class CategoryService {
     }
 
     public CategoryResponseDTO update(Long id, CategoryDTO dto) {
-        Category category = repository.findById(id).orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
+        Category category = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada"));
 
         category.setNome(dto.nome());
+
+        Category saved = repository.save(category);
 
         return new CategoryResponseDTO(
                 category.getId(),

@@ -8,6 +8,8 @@ import ex.show.repository.CategoryRepository;
 import ex.show.repository.ShowRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -105,5 +107,27 @@ public class ShowService {
                 show.getPreco(),
                 show.getCategory().getNome()
         );
+    }
+
+    //filtrar resultados
+
+    public List<ShowResponseDTO> search(
+            Long categoryId,
+            String local,
+            LocalDateTime inicio,
+            LocalDateTime fim,
+            BigDecimal precoMin,
+            BigDecimal precoMax
+    ) {
+        return showRepository.search(
+                categoryId,
+                local,
+                inicio,
+                fim,
+                precoMin,
+                precoMax
+        ).stream()
+                .map(this::toDTO)
+                .toList();
     }
 }

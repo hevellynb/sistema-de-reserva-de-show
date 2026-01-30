@@ -2,11 +2,11 @@ package ex.show.controller;
 
 import ex.show.dto.ShowResponseDTO;
 import ex.show.service.ShowService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -19,13 +19,20 @@ public class ShowController {
         this.service = service;
     }
 
-    @GetMapping
-    public List<ShowResponseDTO> list() {
-        return service.list();
-    }
-
     @GetMapping("/{id}")
     public ShowResponseDTO getById(@PathVariable Long id) {
         return service.getById(id);
+    }
+
+    @GetMapping
+    public List<ShowResponseDTO> search(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) String local,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
+            @RequestParam(required = false) BigDecimal precoMin,
+            @RequestParam(required = false) BigDecimal precoMax
+            ) {
+        return service.search(categoryId, local, inicio, fim, precoMin, precoMax);
     }
 }
