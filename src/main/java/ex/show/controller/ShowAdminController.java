@@ -4,10 +4,12 @@ import ex.show.dto.ShowDTO;
 import ex.show.dto.ShowResponseDTO;
 import ex.show.service.ShowService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/shows")
+@PreAuthorize("hasRole('ADMIN')")
 public class ShowAdminController {
 
     private final ShowService service;

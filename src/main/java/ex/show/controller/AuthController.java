@@ -1,11 +1,12 @@
 package ex.show.controller;
 
 import ex.show.dto.LoginRequestDTO;
-import ex.show.dto.LoginResponseDTO;
-import ex.show.model.entity.User;
-import ex.show.repository.UserRepository;
+import ex.show.dto.TokenResponseDTO;
 import ex.show.service.JwtService;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,27 +16,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final UserRepository repository;
-    private final PasswordEncoder encoder;
+    private final AuthenticationManager authManager;
     private final JwtService jwtService;
 
-    public AuthController(UserRepository repository, PasswordEncoder encoder, JwtService jwtService) {
-        this.repository = repository;
-        this.encoder = encoder;
+    public AuthController(AuthenticationManager authManager, JwtService jwtService) {
+        this.authManager = authManager;
         this.jwtService = jwtService;
     }
 
     @PostMapping("/login")
-    public LoginResponseDTO login(@RequestBody LoginRequestDTO dto) {
+    public TokenResponseDTO login(@RequestBody LoginRequestDTO request) {
 
-        User user = repository.findByEmail(dto.email())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Authentication authentication = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.senha()
+                )
+        );
 
-        if (!encoder.matches(dto.senha(), user.getSenha())) {
-            throw new RuntimeException("Senha inválida");
-        }
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        String token = jwtService.generateToken(user);
 
-        String token = jwtService.gerarToken(user.getEmail(), user.getRole().name());
-        return new LoginResponseDTO(token);
+        return new TokenResponseDTO(token);
     }
 }

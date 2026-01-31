@@ -3,12 +3,14 @@ package ex.show.controller;
 import ex.show.dto.CategoryDTO;
 import ex.show.dto.CategoryResponseDTO;
 import ex.show.service.CategoryService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/admin/categories")
+@PreAuthorize("hasRole('ADMIN')")
 public class CategoryController {
 
     private CategoryService service;
