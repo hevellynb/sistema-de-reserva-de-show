@@ -2,9 +2,8 @@ package ex.show.service;
 
 import ex.show.dto.CreateReservationDTO;
 import ex.show.dto.ReservationResponseDTO;
-import ex.show.model.entity.Reservation;
-import ex.show.model.entity.ReservationStatus;
-import ex.show.model.entity.Show;
+import ex.show.model.entity.*;
+import ex.show.repository.RefundRepository;
 import ex.show.repository.ReservationRepository;
 import ex.show.repository.ShowRepository;
 import ex.show.repository.UserRepository;
@@ -21,11 +20,13 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final ShowRepository showRepository;
+    private final RefundRepository refundRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository, ShowRepository showRepository) {
+    public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository, ShowRepository showRepository,  RefundRepository refundRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.showRepository = showRepository;
+        this.refundRepository = refundRepository;
     }
 
     @Transactional
@@ -72,6 +73,40 @@ public class ReservationService {
                 .stream()
                 .map(this::toDTO)
                 .toList();
+    }
+
+    @Transactional
+    public void cancel(Long reservationId) {
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+
+        if (reservation.getStatus() == ReservationStatus.CANCELADA) {
+            throw new RuntimeException("Reserva já cancelada.");
+        }
+
+        Show show = reservation.getShow();
+        show.setIngressosDisponiveis(
+                show.getIngressosDisponiveis() + reservation.getQuantidade()
+        );
+
+        if (reservation.getStatus() == ReservationStatus.APROVADA) {
+
+            if (!refundRepository.existsByReservationId(reservationId)) {
+                Refund refund = new Refund();
+                refund.setReservation(reservation);
+                refund.setValor(reservation.getValorTotal());
+                refund.setDataEstorno(LocalDateTime.now());
+                refund.setStatus(RefundStatus.PROCESSADO);
+
+                refundRepository.save(refund);
+            }
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELADA);
+
+        showRepository.save(show);
+        reservationRepository.save(reservation);
     }
 
     private ReservationResponseDTO toDTO(Reservation r) {

@@ -44,7 +44,7 @@ public class PaymentService {
         payment.setDataPagamento(LocalDateTime.now());
         payment.setConfirmado(true);
 
-        reservation.setStatus(ReservationStatus.APROVADO);
+        reservation.setStatus(ReservationStatus.APROVADA);
 
         paymentRepository.save(payment);
 

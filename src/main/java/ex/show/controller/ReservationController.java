@@ -29,4 +29,9 @@ public class ReservationController {
             @RequestParam Long userId) {
         return service.listByUser(userId);
     }
+
+    @DeleteMapping("/{id}")
+    public void cancel(@PathVariable Long id){
+        service.cancel(id);
+    }
 }
