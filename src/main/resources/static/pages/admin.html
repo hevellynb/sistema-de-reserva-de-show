@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - ShowManager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+     <div id="modal-show" class="modal">
+        <div class="modal-background" onclick="fecharModal()"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h2 class="title is-4">Configurar Show</h2>
+                <form id="form-show" onsubmit="salvarShow(event)">
+                    <input type="hidden" id="show-id">
+                    <div class="field">
+                        <label class="label">Nome do Evento</label>
+                        <input class="input" type="text" id="show-nome" required>
+                    </div>
+                    <div class="field">
+                        <label class="label">Descrição</label>
+                        <textarea class="textarea" id="show-descricao" rows="2"></textarea>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <label class="label">Data e Hora</label>
+                            <input class="input" type="datetime-local" id="show-dataHora" required>
+                        </div>
+                        <div class="column">
+                            <label class="label">Local</label>
+                            <input class="input" type="text" id="show-local" required>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <label class="label">Total Ingressos</label>
+                            <input class="input" type="number" id="show-totalIngressos" required>
+                        </div>    
+                    <div class="column">
+                         <label class="label">Preço</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="number" step="0.01" id="show-preco" 
+                                onblur="this.value = parseFloat(this.value).toFixed(2)" required>
+                            <span class="icon is-small is-left">
+                                <i style="font-style: normal; font-size: 0.8rem; padding-left: 5px;">R$</i>
+                            </span>
+                        </div>
+                    </div>
+                        <div class="column">
+                            <label class="label">Categoria (ID)</label>
+                            <input class="input" type="number" id="show-categoryId" value="1" required>
+                        </div>
+                    </div>
+                    <div class="buttons is-right">
+                        <button type="button" class="button" onclick="fecharModal()">Cancelar</button>
+                        <button type="submit" class="button is-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close" onclick="fecharModal()"></button>
+    </div>
+
+    <nav class="navbar is-dark">
+        <div class="container">
+            <div class="navbar-brand"><a class="navbar-item"><strong> Painel Admin</strong></a></div>
+            <div class="navbar-end">
+                <div class="navbar-item"><button onclick="logout()" class="button is-danger">Sair</button></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="container mt-5">
+        <div class="columns">
+            <div class="column is-3">
+                <aside class="menu">
+                    <p class="menu-label">Administração</p>
+                    <ul class="menu-list">
+                        <li><a id="link-shows" class="is-active" onclick="irParaShows()">Gerenciar Shows</a></li>
+                        <li><a id="link-relatorios" onclick="mostrarRelatorios()">Relatórios Financeiros</a></li>
+                    </ul>
+                </aside>
+            </div>
+
+            <div class="column is-9">
+                <div id="container-shows">
+                    <div class="level">
+                        <div class="level-left"><h1 class="title">Controle de Eventos</h1></div>
+                        <div class="level-right">
+                            <button class="button is-success" onclick="abrirModalShow()">+ Novo Show</button>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <p class="mb-4">Gerencie os shows cadastrados abaixo:</p>
+                        <table class="table is-fullwidth is-striped is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Local</th>
+                                    <th>Data</th>
+                                    <th>Preço</th>
+                                    <th>Ingressos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-admin-shows"></tbody> 
+                        </table>
+                    </div>
+                </div>
+
+                <div id="container-relatorios" style="display: none;">
+                    <h1 class="title">Relatórios de Vendas</h1>
+                    <div class="columns">
+                        <div class="column">
+                            <div class="notification is-link is-light">
+                                <p class="heading">Total Arrecadado</p>
+                                <p class="title" id="total-receita">R$ 0,00</p>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="notification is-primary is-light">
+                                <p class="heading">Ingressos Vendidos</p>
+                                <p class="title" id="total-ingressos">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <h2 class="subtitle">Vendas por Show</h2>
+                        <table class="table is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>Show</th>
+                                    <th>Qtd Vendida</th>
+                                    <th>Total Bruto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-relatorio-vendas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </section>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/admin.js"></script> 
+    <script>
+        const role = localStorage.getItem('role');
+        if (role !== 'ROLE_ADMIN') {
+            alert("Acesso negado!");
+            window.location.href = 'dashboard.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '../index.html';
+        }
+
+        function abrirModalShow() {
+        const campoId = document.getElementById('show-id');
+        if (campoId) {
+            campoId.value = ''; 
+        }
+        const formulario = document.getElementById('form-show');
+        if (formulario) {
+            formulario.reset();
+        }
+        document.getElementById('modal-show').classList.add('is-active');
+            }
+
+        function fecharModal() {
+            document.getElementById('modal-show').classList.remove('is-active');
+            document.getElementById('form-show').reset();
+        }
+    </script>
+</body>
+</html>

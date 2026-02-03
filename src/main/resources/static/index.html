@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistemas de Shows</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-4">
+                    <form id="loginForm" class="box">
+                        <h1 class="title has-text-centered">Acesso ao Sistema</h1>
+                        <div class="field">
+                            <label class="label">E-mail</label>
+                            <div class="control">
+                                <input id="email" class="input" type="email" placeholder="admin@admin.com" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Senha</label>
+                            <div class="control">
+                                <input id="password" class="input" type="password" placeholder="******" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="button is-primary is-fullwidth">Entrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="js/auth.js"></script>
+</body>
+</html>

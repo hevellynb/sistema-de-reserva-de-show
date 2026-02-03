@@ -33,31 +33,28 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<SalesByShowReportDTO> salesByShow();
 
     @Query("""
-        SELECT new ex.show.dto.RevenueReportDTO(
-            COUNT(r.id),
-            SUM(r.valorTotal)
-        )
-        FROM Reservation r
-        WHERE r.status = 'PAGA'
+    SELECT new ex.show.dto.RevenueReportDTO(
+        COUNT(r.id),
+        SUM(r.valorTotal)
+    )
+    FROM Reservation r
+    WHERE r.status = 'APROVADA' 
     """)
     RevenueReportDTO totalRevenue();
 
     @Query("""
-        SELECT new ex.show.dto.SalesByPeriodReportDTO(
-            r.dataReserva,
-            COUNT(r.id),
-            SUM(r.valorTotal)
-        )
-        FROM Reservation r
-        WHERE r.status = 'PAGA'
-        AND r.dataReserva BETWEEN :inicio AND :fim
-        GROUP BY r.dataReserva
-        ORDER BY r.dataReserva
-    """)
-    List<SalesByPeriodReportDTO> salesByPeriod(
-            @Param("inicio") LocalDateTime inicio,
-            @Param("fim") LocalDateTime fim
-    );
+    SELECT new ex.show.dto.SalesByPeriodReportDTO(
+        r.dataReserva,
+        COUNT(r.id),
+        SUM(r.valorTotal)
+    )
+    FROM Reservation r
+    WHERE r.status = 'APROVADA'
+    AND r.dataReserva BETWEEN :inicio AND :fim
+    GROUP BY r.dataReserva
+    ORDER BY r.dataReserva
+""")
+    List<SalesByPeriodReportDTO> salesByPeriod(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
     @Query("""
         SELECT new ex.show.dto.CancellationReportDTO(
@@ -68,6 +65,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         WHERE r.status = 'CANCELADA'
     """)
     CancellationReportDTO cancellationReport();
-
-
 }

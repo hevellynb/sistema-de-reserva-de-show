@@ -1,0 +1,63 @@
+.navbar.is-custom-client {
+    background-color: #2839f9 !important;
+    border-bottom: 3px solid #78d7dc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.navbar.is-custom-client .navbar-item strong {
+    color: #ffffff !important;
+}
+
+.button.is-logout-client {
+    background-color: #90139f !important;
+    color: #ffffff !important;
+    border: none;
+    font-weight: bold;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+.button.is-logout-client:hover {
+    background-color: #7a0f87 !important;
+    transform: scale(1.05);
+}
+
+.btn-principal-client {
+    background-color: #78d7dc !important;
+    color: #000000 !important;
+    border: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-principal-client:hover {
+    background-color: #92d0d1 !important;
+    color: #000000 !important;
+}
+
+.preco-destaque {
+    color: #90139f !important;
+    font-weight: bold;
+}
+
+.menu-list a.is-active {
+    background-color: #85a375 !important;
+    color: #ffffff !important;
+}
+
+.button.is-light.is-rounded:hover, 
+.button.is-light.is-rounded.is-active {
+    background-color: #2839f9 !important;
+    color: white !important;
+    border-color: #2839f9 !important;
+}
+
+.btn-cancelar-reserva {
+    background-color: transparent !important;
+    color: #90139f !important;
+    border: 1px solid #90139f !important;
+}
+
+.btn-cancelar-reserva:hover {
+    background-color: #90139f !important;
+    color: white !important;
+}

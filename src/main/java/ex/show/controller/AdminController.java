@@ -47,4 +47,5 @@ public class AdminController {
     public void deactivateClient(@PathVariable Long id) {
         userService.deactivateClient(id);
     }
+
 }

@@ -3,10 +3,7 @@ package ex.show.service;
 import ex.show.dto.CreateReservationDTO;
 import ex.show.dto.ReservationResponseDTO;
 import ex.show.model.entity.*;
-import ex.show.repository.RefundRepository;
-import ex.show.repository.ReservationRepository;
-import ex.show.repository.ShowRepository;
-import ex.show.repository.UserRepository;
+import ex.show.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +18,14 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final ShowRepository showRepository;
     private final RefundRepository refundRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository, ShowRepository showRepository,  RefundRepository refundRepository) {
+    public ReservationService(ReservationRepository reservationRepository, UserRepository userRepository, ShowRepository showRepository,  RefundRepository refundRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
         this.showRepository = showRepository;
         this.refundRepository = refundRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -107,6 +106,20 @@ public class ReservationService {
 
         showRepository.save(show);
         reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void confirmarPagamentoPeloCliente(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+
+        reservation.setStatus(ReservationStatus.APROVADA);
+        reservationRepository.save(reservation);
+
+        paymentRepository.findByReservationId(reservationId).ifPresent(p -> {
+            p.setConfirmado(true);
+            paymentRepository.save(p);
+        });
     }
 
     private ReservationResponseDTO toDTO(Reservation r) {

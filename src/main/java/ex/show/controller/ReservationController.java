@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
+@CrossOrigin(origins = "http://127.0.0.1:5500")
 public class ReservationController {
 
     private final ReservationService service;
@@ -33,5 +34,10 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public void cancel(@PathVariable Long id){
         service.cancel(id);
+    }
+
+    @PatchMapping("/{id}/confirm-payment")
+    public void confirmPayment(@PathVariable Long id) {
+        service.confirmarPagamentoPeloCliente(id);
     }
 }
