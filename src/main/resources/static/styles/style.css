@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bitcount+Single:wght@100..900&display=swap');
+
 .navbar.is-custom-client {
     background-color: #2839f9 !important;
     border-bottom: 3px solid #78d7dc;
@@ -84,4 +86,12 @@ select {
 .has-text-danger {
     color: #a7321c !important;
     font-weight: bold;
+}
+
+#logo {
+    font-family: "Bitcount Single", sans-serif;
+    font-size: 30px;
+    font-weight: 300;
+    color: white;
+    filter: drop-shadow(4px 6px 7px #000000);
 }

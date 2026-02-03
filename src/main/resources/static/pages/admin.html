@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin</title>
+    <title>GiroCultural - Painel Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="shortcut icon" href="../images/ingressos.png" type="image/x-icon">
+    <link rel="stylesheet" href="../styles/style.css" />
 </head>
 <style>
     section.container {
@@ -85,7 +87,10 @@
 
     <nav class="navbar is-dark">
         <div class="container">
-            <div class="navbar-brand"><a class="navbar-item"><strong> Painel Admin</strong></a></div>
+            <div class="navbar-brand" style="display: flex; align-items: center;">
+                <img src="../images/ingressos.png" style="width: 35px; height: 35px;">
+                <a class="navbar-item" id="logo">  GiroCultural</a>
+            </div>
             <div class="navbar-end">
                 <div class="navbar-item">
                     <button onclick="logout()" class="button is-danger">Sair</button>
@@ -101,8 +106,8 @@
                     <p class="menu-label">Administração</p>
                     <ul class="menu-list">
                         <li><a id="link-shows" class="is-active" onclick="irParaShows()">Gerenciar Shows</a></li>
-                        <li><a id="link-relatorios" onclick="mostrarRelatorios()">Relatórios Financeiros</a></li>
                         <li><a id="link-categorias" onclick="mostrarCategorias()">Gerenciar Categorias</a></li>
+                        <li><a id="link-relatorios" onclick="mostrarRelatorios()">Relatórios Financeiros</a></li>               
                     </ul>
                 </aside>
             </div>
