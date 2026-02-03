@@ -40,4 +40,9 @@ public class ReservationController {
     public void confirmPayment(@PathVariable Long id) {
         service.confirmarPagamentoPeloCliente(id);
     }
+
+    @GetMapping("/report")
+    public List<ReservationResponseDTO> getReport() {
+        return service.listAll();
+    }
 }

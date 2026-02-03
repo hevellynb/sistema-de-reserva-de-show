@@ -2,30 +2,47 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Minhas Reservas - ShowManager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Reservas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="../styles/style.css"> </head>
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        section.container {
+            min-height: calc(100vh - 200px);
+            margin-bottom: 3rem;
+        }
+
+        footer.footer {
+            padding: 3rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .table td .buttons {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar is-custom-client">
-    <div class="container">
-        <div class="navbar-brand">
-            <a class="navbar-item" href="dashboard.html">
-                <strong>Painel de Shows</strong>
-            </a>
-        </div>
-        <div class="navbar-end">
-            <div class="navbar-item">
-                <button onclick="logout()" class="button is-logout-client">Sair</button>
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="dashboard.html">
+                    <strong>Painel de Shows</strong>
+                </a>
+            </div>
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <button onclick="logout()" class="button is-logout-client">Sair</button>
+                </div>
             </div>
         </div>
-    </div>
     </nav>
 
     <section class="container mt-5">
         <h1 class="title">Minhas Compras</h1>
         <div class="box">
-            <table class="table is-fullwidth is-striped">
+            <table class="table is-fullwidth is-striped is-hoverable">
                 <thead>
                     <tr>
                         <th>Show</th>
@@ -42,7 +59,34 @@
         </div>
     </section>
 
+    <footer class="footer has-background-dark has-text-white">
+        <div class="container">
+            <div class="content has-text-centered">
+                <p>Sistema de Gestão de Eventos</p>
+                <p>
+                    Feito por 
+                    <span class="has-text-info has-text-weight-bold">Akilan</span> 
+                    e 
+                    <span class="has-text-info has-text-weight-bold">Hevellyn</span>
+                </p>
+                <p class="is-size-7" style="opacity: 0.5;">
+                    © 2026 Todos os direitos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
     <script src="../js/api.js"></script>
     <script src="../js/reservas.js"></script>
+    <script>
+        if (!localStorage.getItem('token')) {
+            window.location.href = '../index.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '../index.html';
+        }
+    </script>
 </body>
 </html>

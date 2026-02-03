@@ -7,30 +7,72 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-    <section class="section">
-        <div class="container">
-            <div class="columns is-centered">
-                <div class="column is-4">
-                    <form id="loginForm" class="box">
-                        <h1 class="title has-text-centered">Acesso ao Sistema</h1>
-                        <div class="field">
-                            <label class="label">E-mail</label>
-                            <div class="control">
-                                <input id="email" class="input" type="email" placeholder="admin@admin.com" required>
-                            </div>
+   <section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-4">
+                <form id="loginForm" class="box">
+                    <h1 class="title has-text-centered">Acesso ao Sistema</h1>
+                    
+                    <div class="field">
+                        <label class="label">E-mail</label>
+                        <div class="control">
+                            <input id="email" class="input" type="email" placeholder="admin@admin.com" required>
                         </div>
-                        <div class="field">
-                            <label class="label">Senha</label>
-                            <div class="control">
-                                <input id="password" class="input" type="password" placeholder="******" required>
-                            </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Senha</label>
+                        <div class="control">
+                            <input id="password" class="input" type="password" placeholder="******" required>
                         </div>
-                        <button type="submit" class="button is-primary is-fullwidth">Entrar</button>
-                    </form>
+                    </div>
+
+                    <button type="submit" class="button is-primary is-fullwidth">Entrar</button>
+                </form>
+
+                <div class="has-text-centered mt-3">
+                    <p>Não tem uma conta? <a href="#" onclick="abrirModalCadastro()">Cadastre-se aqui</a></p>
                 </div>
-            </div>
+
+                <div id="modal-cadastro" class="modal">
+                    <div class="modal-background" onclick="fecharModalCadastro()"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <h2 class="title is-4">Criar Minha Conta</h2>
+                            <form onsubmit="realizarCadastro(event)">
+                                <div class="field">
+                                    <label class="label">Nome Completo</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="cad-nome" required>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">E-mail</label>
+                                    <div class="control">
+                                        <input class="input" type="email" id="cad-email" required>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Senha</label>
+                                    <div class="control">
+                                        <input class="input" type="password" id="cad-senha" required>
+                                    </div>
+                                </div>
+                                <div class="buttons is-right">
+                                    <button type="button" class="button" onclick="fecharModalCadastro()">Cancelar</button>
+                                    <button type="submit" class="button is-primary">Finalizar Cadastro</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <button class="modal-close is-large" aria-label="close" onclick="fecharModalCadastro()"></button>
+                </div>
+                </div>
         </div>
-    </section>
-    <script src="js/auth.js"></script>
+    </div>
+</section>
+
+<script src="js/auth.js"></script>
 </body>
 </html>

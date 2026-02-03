@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservationService {
@@ -36,6 +37,10 @@ public class ReservationService {
         Show show = showRepository.findById(dto.showId())
                 .orElseThrow(() -> new RuntimeException("Show não encontrado"));
 
+        if (dto.quantidade() <= 0) {
+            throw new RuntimeException("A quantidade de ingressos deve ser pelo menos 1.");
+        }
+
         if (!show.getAtivo()) {
             throw new RuntimeException("Show indisponível");
         }
@@ -45,6 +50,7 @@ public class ReservationService {
         }
 
         show.setIngressosDisponiveis(show.getIngressosDisponiveis() - dto.quantidade());
+        showRepository.save(show);
 
         Reservation reservation = new Reservation();
         reservation.setUser(
@@ -129,7 +135,13 @@ public class ReservationService {
                 r.getQuantidade(),
                 r.getValorTotal(),
                 r.getStatus(),
-                r.getDataReserva()
+                r.getShow().getDataHora()
         );
+    }
+
+    public List<ReservationResponseDTO> listAll() {
+        return reservationRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 }

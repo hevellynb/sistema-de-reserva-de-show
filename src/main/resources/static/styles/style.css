@@ -61,3 +61,27 @@
     background-color: #90139f !important;
     color: white !important;
 }
+
+input[type="date"].input {
+    border-color: #2839f9;
+    color: #2839f9;
+}
+
+select {
+    border-color: #2839f9 !important;
+}
+
+.box {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.has-text-warning {
+    color: #cc982a !important;
+    font-weight: bold;
+}
+
+.has-text-danger {
+    color: #a7321c !important;
+    font-weight: bold;
+}

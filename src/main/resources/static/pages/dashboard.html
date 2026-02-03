@@ -1,134 +1,176 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cliente - ShowManager</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"
-    />
+    <title>Cliente - Painel de Shows</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
     <link rel="stylesheet" href="../styles/style.css" />
-  </head>
-  <body>
+    <style>
+        section.container {
+            min-height: calc(100vh - 200px);
+            margin-bottom: 3rem;
+        }
+
+        footer.footer {
+            padding: 3rem 1.5rem;
+            margin-top: auto;
+        }
+
+        .table td .buttons {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+    </style>
+</head>
+<body>
     <nav class="navbar is-custom-client">
-      <div class="container">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="dashboard.html">
-            <strong>Painel de Shows</strong>
-          </a>
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="dashboard.html">
+                    <strong>Painel de Shows</strong>
+                </a>
+            </div>
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <button onclick="excluirMinhaConta()" class="button is-danger is-light is-small">
+                            Excluir Conta
+                        </button>
+                        <button onclick="logout()" class="button is-danger is-small">
+                            Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="navbar-end">
-          <div class="navbar-item">
-            <button onclick="logout()" class="button is-logout-client">
-              Sair
-            </button>
-          </div>
-        </div>
-      </div>
     </nav>
 
     <section class="container mt-5">
-      <div class="columns">
-        <div class="column is-3">
-          <aside class="menu">
-            <p class="menu-label">Menu Cliente</p>
-            <ul class="menu-list">
-              <li><a class="is-active">Comprar Ingressos</a></li>
-              <li><a href="minhas-reservas.html">Minhas Compras</a></li>
-            </ul>
-          </aside>
+        <div class="columns">
+            <div class="column is-3">
+                <aside class="menu">
+                    <p class="menu-label">Menu Cliente</p>
+                    <ul class="menu-list">
+                        <li><a class="is-active">Comprar Ingressos</a></li>
+                        <li><a href="minhas-reservas.html">Minhas Compras</a></li>
+                    </ul>
+                </aside>
+            </div>
+
+            <div class="column is-9">
+                <div class="box">
+                    <div class="columns is-vcentered">
+                        <div class="column is-5">
+                            <div class="field">
+                                <label class="label is-small">Filtrar por Data:</label>
+                                <div class="control">
+                                    <input type="date" id="filtro-data" class="input" onchange="aplicarFiltros()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column is-5">
+                            <div class="field">
+                                <label class="label is-small">Estilo de Show:</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select id="filtro-categoria-select" onchange="aplicarFiltros()">
+                                            <option value="">Todos os Estilos</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column is-2 mt-4">
+                            <button class="button is-fullwidth is-small is-light" onclick="limparFiltros()">
+                                Limpar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <h1 class="title">Shows Disponíveis</h1>
+                <div id="lista-shows" class="columns is-multiline">
+                    <p class="column">Carregando shows...</p>
+                </div>
+            </div>
         </div>
-
-        <div class="column is-9">
-          <h2 class="subtitle is-6 mb-2">Filtrar por Estilo:</h2>
-          <div id="filtro-categorias" class="buttons">
-            <button
-              class="button is-light is-rounded"
-              onclick="filtrarPorCategoria(null)"
-            >
-              Todos
-            </button>
-          </div>
-
-          <hr />
-
-          <h1 class="title">Shows Disponíveis</h1>
-          <div id="lista-shows" class="columns is-multiline">
-            <p class="column">Carregando shows...</p>
-          </div>
-        </div>
-      </div>
     </section>
 
     <div id="modal-reserva" class="modal">
-      <div class="modal-background" onclick="fecharModal()"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Finalizar Reserva</p>
-          <button
-            class="delete"
-            aria-label="close"
-            onclick="fecharModal()"
-          ></button>
-        </header>
-        <section class="modal-card-body">
-          <input type="hidden" id="modal-show-id" />
-          <p class="subtitle is-5" id="modal-show-nome">Nome do Show</p>
+        <div class="modal-background" onclick="fecharModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Finalizar Reserva</p>
+                <button class="delete" aria-label="close" onclick="fecharModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <input type="hidden" id="modal-show-id" />
+                <p class="subtitle is-5" id="modal-show-nome">Nome do Show</p>
 
-          <div class="field">
-            <label class="label">Quantidade de Ingressos:</label>
-            <div class="control">
-              <input
-                id="modal-quantidade"
-                class="input"
-                type="number"
-                value="1"
-                min="1"
-                oninput="calcularTotalModal()"
-              />
-            </div>
-          </div>
+                <div class="field">
+                    <label class="label">Quantidade de Ingressos:</label>
+                    <div class="control">
+                        <input id="modal-quantidade" class="input" type="number" value="1" min="1" oninput="calcularTotalModal()" />
+                    </div>
+                </div>
 
-          <div class="field">
-            <label class="label">Forma de Pagamento:</label>
-            <div class="control">
-              <div class="select is-fullwidth">
-                <select id="modal-metodo-pagamento">
-                  <option value="PIX">Pix</option>
-                  <option value="CARTAO_CREDITO">Cartão de Crédito</option>
-                  <option value="BOLETO">Boleto</option>
-                </select>
-              </div>
-            </div>
-          </div>
+                <div class="field">
+                    <label class="label">Forma de Pagamento:</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select id="modal-metodo-pagamento">
+                                <option value="PIX">Pix</option>
+                                <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+                                <option value="BOLETO">Boleto</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-          <p class="is-size-4 mt-4">
-            Total:
-            <strong class="has-text-primary" id="modal-total-valor"
-              >R$ 0,00</strong
-            >
-          </p>
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button btn-confirmar-pgt" onclick="confirmarReserva()">
-            Confirmar Compra
-          </button>
-          <button class="button" onclick="fecharModal()">Cancelar</button>
-        </footer>
-      </div>
+                <p class="is-size-4 mt-4">
+                    Total: <strong class="has-text-primary" id="modal-total-valor">R$ 0,00</strong>
+                </p>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-success" onclick="confirmarReserva()">Confirmar Compra</button>
+                <button class="button" onclick="fecharModal()">Cancelar</button>
+            </footer>
+        </div>
     </div>
+
+    <footer class="footer has-background-dark has-text-white">
+        <div class="container">
+            <div class="content has-text-centered">
+                <p>Sistema de Gestão de Eventos</p>
+                <p>
+                    Feito por
+                    <span class="has-text-info has-text-weight-bold">Akilan</span>
+                    e
+                    <span class="has-text-info has-text-weight-bold">Hevellyn</span>
+                </p>
+                <p class="is-size-7" style="opacity: 0.5;">
+                    © 2026 Todos os direitos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script src="../js/api.js"></script>
     <script src="../js/main.js"></script>
     <script>
-      if (!localStorage.getItem("token"))
-        window.location.href = "../index.html";
+        if (!localStorage.getItem("token")) {
+            window.location.href = "../index.html";
+        }
 
-      function logout() {
-        localStorage.clear();
-        window.location.href = "../index.html";
-      }
+        function logout() {
+            localStorage.clear();
+            window.location.href = "../index.html";
+        }
     </script>
-  </body>
+</body>
 </html>

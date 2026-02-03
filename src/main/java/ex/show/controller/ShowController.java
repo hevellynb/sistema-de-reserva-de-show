@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,12 +30,13 @@ public class ShowController {
     public List<ShowResponseDTO> search(
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String local,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim,
             @RequestParam(required = false) BigDecimal precoMin,
             @RequestParam(required = false) BigDecimal precoMax
             ) {
-        return service.search(categoryId, local, inicio, fim, precoMin, precoMax);
+        return service.search(categoryId, local, data, inicio, fim, precoMin, precoMax);
     }
 
     @PostMapping
