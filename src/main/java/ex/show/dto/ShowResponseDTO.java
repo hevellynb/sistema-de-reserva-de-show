@@ -10,7 +10,9 @@ public record ShowResponseDTO(
         String descricao,
         LocalDateTime dataHora,
         String local,
+        Integer totalIngressos,
         Integer ingressosDisponiveis,
         BigDecimal preco,
+        Long categoryId,
         String categoria
 ) {}

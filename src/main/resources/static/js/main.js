@@ -17,10 +17,13 @@ async function carregarFiltros() {
     if (response.ok) {
       const categorias = await response.json();
       const select = document.getElementById("filtro-categoria-select");
+      
+      select.innerHTML = '<option value="">Todos os Estilos</option>'; 
+      
       categorias.forEach((cat) => {
-        select.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
+          select.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
       });
-    }
+  }
   } catch (error) {
     console.error("Erro ao carregar categorias:", error);
   }
@@ -68,6 +71,8 @@ function exibirShows(shows) {
 
   shows.forEach((show) => {
     const preco = typeof show.preco === "number" ? show.preco.toFixed(2) : "0.00";
+    const categoriaExibicao = show.categoryName || "Geral"; 
+    
     const dataObj = new Date(show.dataHora);
     const dataStr = dataObj.toLocaleString("pt-BR", {
       day: "2-digit",
@@ -95,8 +100,7 @@ function exibirShows(shows) {
             <div class="is-size-6 mb-4">
               <p><strong>Data:</strong> ${dataStr}</p>
               <p><strong>Local:</strong> ${show.local || "Não informado"}</p>
-              <p><strong>Estilo:</strong> ${show.categoryName || "Geral"}</p>
-            </div>
+              <p><strong>Estilo:</strong> ${categoriaExibicao}</p> </div>
 
             <p class="title is-4 has-text-primary mb-5">R$ ${preco}</p>
             
@@ -109,7 +113,7 @@ function exibirShows(shows) {
         </div>
       </div>
     `;
-  });
+});
 }
 
 function limparFiltros() {

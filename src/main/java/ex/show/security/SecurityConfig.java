@@ -36,14 +36,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**", "/h2-console/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/shows/**", "/categories/**").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/shows/**", "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/shows/**", "/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/shows/**", "/categories/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/reservations/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/users/**").authenticated()
                         .requestMatchers("/reservations/**").authenticated()
-
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

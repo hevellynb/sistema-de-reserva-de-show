@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ShowRepository extends JpaRepository<Show, Long> {
+
+    List<Show> findByCategoryId(Long categoryId);
+
     List<Show> findByAtivoTrue();
 
     @Query("""

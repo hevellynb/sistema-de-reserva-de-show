@@ -105,8 +105,10 @@ public class ShowService {
                 show.getDescricao(),
                 show.getDataHora(),
                 show.getLocal(),
+                show.getTotalIngressos(),
                 show.getIngressosDisponiveis(),
                 show.getPreco(),
+                show.getCategory().getId(),
                 show.getCategory().getNome()
         );
     }

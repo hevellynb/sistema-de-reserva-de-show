@@ -39,18 +39,4 @@ public class ShowController {
         return service.search(categoryId, local, data, inicio, fim, precoMin, precoMax);
     }
 
-    @PostMapping
-    public ShowResponseDTO create(@RequestBody ShowDTO dto) {
-        return service.create(dto);
-    }
-
-    @PutMapping("/{id}")
-    public ShowResponseDTO update(@PathVariable Long id, @RequestBody ShowDTO dto) {
-        return service.update(id, dto);
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.deactivate(id);
-    }
 }
