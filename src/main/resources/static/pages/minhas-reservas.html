@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Minhas Reservas - ShowManager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="../styles/style.css"> </head>
+</head>
+<body>
+    <nav class="navbar is-custom-client">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="dashboard.html">
+                <strong>Painel de Shows</strong>
+            </a>
+        </div>
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <button onclick="logout()" class="button is-logout-client">Sair</button>
+            </div>
+        </div>
+    </div>
+    </nav>
+
+    <section class="container mt-5">
+        <h1 class="title">Minhas Compras</h1>
+        <div class="box">
+            <table class="table is-fullwidth is-striped">
+                <thead>
+                    <tr>
+                        <th>Show</th>
+                        <th>Data</th>
+                        <th>Qtd</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-reservas">
+                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/reservas.js"></script>
+</body>
+</html>

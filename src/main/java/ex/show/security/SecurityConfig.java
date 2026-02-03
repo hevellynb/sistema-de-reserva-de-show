@@ -2,7 +2,9 @@ package ex.show.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,16 +28,19 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .headers(h -> h.frameOptions(f -> f.disable()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/h2-console/**",
-                                "/shows/**",
-                                "/categories/**"
-                        ).permitAll()
+                        .requestMatchers("/auth/**", "/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/shows/**", "/categories/**").permitAll()
+
+                        .requestMatchers(HttpMethod.POST, "/shows/**", "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/shows/**", "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/shows/**", "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/reservations/**").authenticated()
+                        .requestMatchers("/reservations/**").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 

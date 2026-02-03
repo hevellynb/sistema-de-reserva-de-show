@@ -1,5 +1,6 @@
 package ex.show.controller;
 
+import ex.show.dto.ShowDTO;
 import ex.show.dto.ShowResponseDTO;
 import ex.show.service.ShowService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,5 +35,20 @@ public class ShowController {
             @RequestParam(required = false) BigDecimal precoMax
             ) {
         return service.search(categoryId, local, inicio, fim, precoMin, precoMax);
+    }
+
+    @PostMapping
+    public ShowResponseDTO create(@RequestBody ShowDTO dto) {
+        return service.create(dto);
+    }
+
+    @PutMapping("/{id}")
+    public ShowResponseDTO update(@PathVariable Long id, @RequestBody ShowDTO dto) {
+        return service.update(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        service.deactivate(id);
     }
 }

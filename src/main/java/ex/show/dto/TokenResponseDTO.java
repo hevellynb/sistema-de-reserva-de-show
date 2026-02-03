@@ -1,3 +1,3 @@
 package ex.show.dto;
 
-public record TokenResponseDTO(String token) {}
+public record TokenResponseDTO(String token, String role, Long userId) {}
