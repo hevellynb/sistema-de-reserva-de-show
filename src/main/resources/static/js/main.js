@@ -1,264 +1,229 @@
-document.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem('token')) {
-        window.location.href = '../index.html';
-    } else {
-        carregarShows();
-    }
-});
-
-    function exibirShows(shows) {
-        const container = document.getElementById('lista-shows');
-        if (!container) return;
-        
-        container.innerHTML = ''; 
-
-        if (!shows || shows.length === 0) {
-            container.innerHTML = '<p class="column is-full has-text-centered">Nenhum show disponível no momento.</p>';
-            return;
-        }
-
-        shows.forEach(show => {
-            const nome = show.nome || 'Evento sem nome';
-            const local = show.local || 'Não informado';
-            const preco = typeof show.preco === 'number' ? show.preco.toFixed(2) : '0.00';
-            
-            let dataStr = 'Data não informada';
-            if (show.dataHora) {
-                const dataObj = new Date(show.dataHora);
-                dataStr = dataObj.toLocaleString('pt-BR', { 
-                    day: '2-digit', month: '2-digit', year: 'numeric', 
-                    hour: '2-digit', minute: '2-digit' 
-                });
-            }
-
-            container.innerHTML += `
-                <div class="column is-4">
-                    <div class="card" style="border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        <div class="card-content">
-                            <p class="title is-5 mb-3">${nome}</p>
-                            
-                            <div class="mb-4 is-size-6">
-                                <p class="mb-1"><strong>Data:</strong> ${dataStr}</p>
-                                <p><strong>Local:</strong> ${local}</p>
-                            </div>
-
-                            <p class="title is-4 has-text-primary mb-4">R$ ${preco}</p>
-                            
-                            <button class="button is-primary is-fullwidth" onclick="prepararReserva(${show.id})">
-                                <strong>Reservar Ingresso</strong>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("Página carregada, buscando dados...");
+document.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("token")) {
+    window.location.href = "../index.html";
+  } else {
     carregarFiltros();
-    
-    filtrarPorCategoria(null); 
+    aplicarFiltros();
+  }
 });
-
-async function carregarShows() {
-    const response = await fetchWithAuth('/shows'); 
-    
-    if (response && response.ok) {
-        const shows = await response.json();
-        const container = document.getElementById('lista-shows');
-        container.innerHTML = ''; 
-
-        if (shows.length === 0) {
-            container.innerHTML = '<p class="column is-12">Nenhum show encontrado no banco de dados.</p>';
-            return;
-        }
-
-    shows.forEach(show => {
-    const dataFormatada = new Date(show.dataHora).toLocaleDateString('pt-BR');
-    const horaFormatada = new Date(show.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-    container.innerHTML += `
-    <div class="column is-4">
-        <div class="card" style="height: 100%;">
-            <div class="card-content">
-                <p class="title is-5 mb-3">${nome}</p>
-                
-                <div class="content is-size-6 mb-4">
-                    <p class="mb-1"><strong>Data:</strong> ${dataStr}</p>
-                    <p class="mb-0"><strong>Local:</strong> ${local}</p>
-                </div>
-
-                <p class="title is-4 has-text-primary mb-4">R$ ${preco}</p>
-                
-                <button class="button is-primary is-fullwidth is-medium" onclick="prepararReserva(${show.id})">
-                    <strong>Reservar Ingresso</strong>
-                </button>
-            </div>
-        </div>
-    </div>
-`   ;
-});
-
-    }
-}
-
-async function fazerReserva(showId) {
-    const userId = localStorage.getItem('userId');
-    const reservaData = { showId: showId, quantidade: 1 };
-
-    try {
-        const response = await fetchWithAuth(`/reservations?userId=${userId}`, {
-            method: 'POST',
-            body: JSON.stringify(reservaData)
-        });
-
-        if (response && response.ok) {
-            alert('Sucesso! Sua reserva para o show foi confirmada.');
-            window.location.href = 'minhas-reservas.html';
-        } else {
-            const erro = await response.json();
-            alert('Erro: ' + (erro.message || 'Não foi possível completar a reserva.'));
-        }
-    } catch (error) {
-        console.error("Erro ao reservar:", error);
-        alert("Erro de conexão com o servidor.");
-    }
-}
 
 async function carregarFiltros() {
-    try {
-        const token = localStorage.getItem('token');
-         const response = await fetch('http://localhost:8080/categories', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch("http://localhost:8080/categories", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-        if (response.ok) {
-            const categorias = await response.json();
-            const container = document.getElementById('filtro-categorias');
+    if (response.ok) {
+      const categorias = await response.json();
+      const select = document.getElementById("filtro-categoria-select");
+      categorias.forEach((cat) => {
+        select.innerHTML += `<option value="${cat.id}">${cat.nome}</option>`;
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao carregar categorias:", error);
+  }
+}
+
+async function aplicarFiltros() {
+
+  const data = document.getElementById("filtro-data").value;
+  const categoryId = document.getElementById("filtro-categoria-select").value;
+  const listaContainer = document.getElementById("lista-shows");
+
+  listaContainer.innerHTML =
+    '<p class="column is-full has-text-centered">Buscando shows...</p>';
+
+  let url = "http://localhost:8080/shows?";
+  if (categoryId) url += `categoryId=${categoryId}&`;
+  if (data) url += `data=${data}`;
+
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const shows = await response.json();
+      exibirShows(shows);
+    } else {
+      listaContainer.innerHTML =
+        '<p class="column is-full has-text-centered">Erro ao buscar shows.</p>';
+    }
+  } catch (error) {
+    console.error("Erro na requisição de filtros:", error);
+  }
+}
+
+function exibirShows(shows) {
+  
+ const container = document.getElementById("lista-shows");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!shows || shows.length === 0) {
+    container.innerHTML =
+      '<p class="column is-full has-text-centered">Nenhum show encontrado para este filtro.</p>';
+    return;
+  }
+
+  shows.forEach((show) => {
+    const preco = typeof show.preco === "number" ? show.preco.toFixed(2) : "0.00";
+    const dataObj = new Date(show.dataHora);
+    const dataStr = dataObj.toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const estoque = show.ingressosDisponiveis;
+    const estaEsgotado = estoque <= 0;
+    const tagEstoque = !estaEsgotado 
+        ? `<span class="tag is-success is-light">${estoque} disponíveis</span>`
+        : `<span class="tag is-danger is-light">Esgotado</span>`;
+
+    container.innerHTML += `
+      <div class="column is-4">
+        <div class="card" style="border-radius: 10px; height: 100%; display: flex; flex-direction: column;">
+          <div class="card-content" style="flex-grow: 1;">
+            <div class="is-flex is-justify-content-space-between is-align-items-start mb-3">
+              <p class="title is-5 mb-0">${show.nome}</p>
+              ${tagEstoque}
+            </div>
             
-            container.innerHTML = '<button class="button is-light is-rounded" onclick="filtrarPorCategoria(null)">Todos</button>';
+            <div class="is-size-6 mb-4">
+              <p><strong>Data:</strong> ${dataStr}</p>
+              <p><strong>Local:</strong> ${show.local || "Não informado"}</p>
+              <p><strong>Estilo:</strong> ${show.categoryName || "Geral"}</p>
+            </div>
 
-            categorias.forEach(cat => {
-                container.innerHTML += `
-                    <button class="button is-link is-light is-rounded" onclick="filtrarPorCategoria(${cat.id})">
-                        ${cat.nome}
-                    </button>
-                `;
-            });
-        }
-    } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
-    }
+            <p class="title is-4 has-text-primary mb-5">R$ ${preco}</p>
+            
+            <button class="button is-link is-fullwidth" 
+                    onclick="prepararReserva(${show.id})" 
+                    ${estaEsgotado ? 'disabled' : ''}>
+                <strong>${estaEsgotado ? 'Indisponível' : 'Reservar Ingresso'}</strong>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
 }
 
-async function filtrarPorCategoria(categoryId) {
-    const listaContainer = document.getElementById('lista-shows');
-    if (listaContainer) {
-        listaContainer.innerHTML = '<p class="column is-full has-text-centered">Carregando eventos...</p>';
-    }
-
-    const url = categoryId 
-        ? `http://localhost:8080/shows?categoryId=${categoryId}` 
-        : 'http://localhost:8080/shows';
-
-    try {
-        const response = await fetch(url);
-        if (response.ok) {
-            const shows = await response.json();
-            exibirShows(shows);
-        } else {
-            console.error("Erro na resposta do servidor:", response.status);
-        }
-    } catch (error) {
-        console.error("Erro de conexão ao buscar shows:", error);
-        if (listaContainer) {
-            listaContainer.innerHTML = '<p class="column is-full has-text-centered has-text-danger">Erro ao conectar com o servidor.</p>';
-        }
-    }
+function limparFiltros() {
+  document.getElementById("filtro-data").value = "";
+  document.getElementById("filtro-categoria-select").value = "";
+  aplicarFiltros();
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    carregarFiltros();
-    
-    filtrarPorCategoria(null); 
-});
 
 let precoShowSelecionado = 0;
+let estoqueDisponivelSelecionado = 0;
 
 function prepararReserva(id) {
-    document.getElementById('modal-reserva').classList.add('is-active');
-    document.getElementById('modal-show-id').value = id;
-    document.getElementById('modal-quantidade').value = 1;
+  document.getElementById("modal-reserva").classList.add("is-active");
+  document.getElementById("modal-show-id").value = id;
 
-    fetch(`http://localhost:8080/shows/${id}`)
-        .then(res => res.json())
-        .then(show => {
-            document.getElementById('modal-show-nome').innerText = show.nome;
-            precoShowSelecionado = show.preco;
-            calcularTotalModal();
-        });
+  fetch(`http://localhost:8080/shows/${id}`)
+    .then((res) => res.json())
+    .then((show) => {
+      document.getElementById("modal-show-nome").innerText = show.nome;
+      precoShowSelecionado = show.preco;
+      
+      estoqueDisponivelSelecionado = show.ingressosDisponiveis; 
+
+      const inputQtd = document.getElementById("modal-quantidade");
+      
+      inputQtd.min = 1; 
+      inputQtd.max = estoqueDisponivelSelecionado;
+      
+      inputQtd.value = estoqueDisponivelSelecionado > 0 ? 1 : 0;
+      inputQtd.disabled = estoqueDisponivelSelecionado <= 0;
+
+      calcularTotalModal();
+    });
 }
 
 function calcularTotalModal() {
-    const qtd = document.getElementById('modal-quantidade').value;
-    const total = qtd * precoShowSelecionado;
-    document.getElementById('modal-total-valor').innerText = `R$ ${total.toFixed(2)}`;
+  const qtd = document.getElementById("modal-quantidade").value;
+  const total = qtd * precoShowSelecionado;
+  document.getElementById("modal-total-valor").innerText =
+    `R$ ${total.toFixed(2)}`;
 }
 
 function fecharModal() {
-    document.getElementById('modal-reserva').classList.remove('is-active');
+  document.getElementById("modal-reserva").classList.remove("is-active");
 }
 
 async function confirmarReserva() {
-    console.log("Botão clicado! Iniciando processo de reserva...");
 
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
-    
-    const showId = document.getElementById('modal-show-id').value;
-    const quantidade = document.getElementById('modal-quantidade').value;
-    const metodo = document.getElementById('modal-metodo-pagamento').value;
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+  const showId = document.getElementById("modal-show-id").value;
+  const quantidade = parseInt(document.getElementById("modal-quantidade").value);
+  const metodo = document.getElementById("modal-metodo-pagamento").value;
 
-    if (!showId || !quantidade || !metodo) {
-        alert("Erro: Dados do formulário incompletos.");
-        return;
-    }
-
-    if (quantidade <= 0) {
-    alert("A quantidade deve ser pelo menos 1 ingresso.");
+  if (quantidade <= 0) {
+    alert("A quantidade de ingressos deve ser maior que zero.");
     return;
+  }
+
+  if (quantidade > estoqueDisponivelSelecionado) {
+    alert(`Desculpe, restam apenas ${estoqueDisponivelSelecionado} ingressos para este show.`);
+    return;
+  }
+
+  const dadosReserva = {
+    showId: parseInt(showId),
+    quantidade: quantidade,
+    metodoPagamento: metodo,
+  };
+
+  try {
+    const response = await fetch(
+      `http://localhost:8080/reservations?userId=${userId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dadosReserva),
+      }
+    );
+
+    if (response.ok) {
+      alert("Reserva realizada com sucesso!");
+      window.location.href = "minhas-reservas.html";
+    } else {
+      const erroMsg = await response.text();
+      alert("Erro: " + erroMsg); 
     }
+  } catch (error) {
+    alert("Erro de conexão com o servidor.");
+  }
+}
 
-    const dadosReserva = {
-        showId: parseInt(showId),
-        quantidade: parseInt(quantidade),
-        metodoPagamento: metodo
-    };
+async function excluirMinhaConta() {
+  if (!confirm("Tem certeza que deseja excluir sua conta?")) return;
 
-    console.log("Dados que serão enviados ao Java:", dadosReserva);
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
 
-    try {
-        const response = await fetch(`http://localhost:8080/reservations?userId=${userId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(dadosReserva)
-        });
+  const response = await fetch(`http://localhost:8080/users/${userId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 
-        if (response.ok) {
-            alert("Reserva realizada com sucesso!");
-            fecharModal();
-            window.location.href = 'minhas-reservas.html'; 
-        } else {
-            const erroMsg = await response.text();
-            console.error("Erro do servidor:", erroMsg);
-            alert("Erro ao realizar reserva: " + erroMsg);
-        }
-    } catch (error) {
-        console.error("Erro na comunicação:", error);
-        alert("Não foi possível conectar ao servidor. Verifique se o Java está rodando.");
-    }
+  if (response.ok) {
+    alert("Conta excluída com sucesso.");
+    localStorage.clear();
+    window.location.href = "../index.html";
+  } else {
+    alert("Erro ao excluir conta: Verifique as permissões no servidor.");
+  }
 }

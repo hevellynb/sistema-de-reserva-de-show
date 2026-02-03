@@ -9,8 +9,10 @@ import ex.show.repository.ShowRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ShowService {
@@ -109,25 +111,31 @@ public class ShowService {
         );
     }
 
-    //filtrar resultados
-
     public List<ShowResponseDTO> search(
             Long categoryId,
             String local,
+            LocalDate data,
             LocalDateTime inicio,
             LocalDateTime fim,
             BigDecimal precoMin,
             BigDecimal precoMax
     ) {
-        return showRepository.search(
-                categoryId,
-                local,
-                inicio,
-                fim,
-                precoMin,
-                precoMax
-        ).stream()
+        return showRepository.findByAtivoTrue().stream()
+                .filter(show -> {
+                    if (categoryId == null) return true;
+                    return show.getCategory() != null && show.getCategory().getId().equals(categoryId);
+                })
+                .filter(show -> {
+                    if (data == null) return true;
+                    return show.getDataHora().toLocalDate().equals(data);
+                })
+                .filter(show -> {
+                    if (local == null || local.isEmpty()) return true;
+                    return show.getLocal().toLowerCase().contains(local.toLowerCase());
+                })
                 .map(this::toDTO)
-                .toList();
+                .collect(Collectors.toList());
     }
+
+
 }

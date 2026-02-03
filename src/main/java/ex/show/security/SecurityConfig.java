@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/shows/**", "/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/shows/**", "/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/reservations/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").authenticated()
                         .requestMatchers("/reservations/**").authenticated()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")

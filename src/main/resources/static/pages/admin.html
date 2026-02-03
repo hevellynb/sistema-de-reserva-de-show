@@ -3,11 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - ShowManager</title>
+    <title>Painel Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
+<style>
+    section.container {
+        min-height: calc(100vh - 200px); 
+        margin-bottom: 3rem;
+    }
+
+    footer.footer {
+        padding: 3rem 1.5rem;
+        margin-top: auto;
+    }
+
+    .table td .buttons {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+</style>
 <body>
-     <div id="modal-show" class="modal">
+    <div id="modal-show" class="modal">
         <div class="modal-background" onclick="fecharModal()"></div>
         <div class="modal-content">
             <div class="box">
@@ -36,20 +52,25 @@
                         <div class="column">
                             <label class="label">Total Ingressos</label>
                             <input class="input" type="number" id="show-totalIngressos" required>
-                        </div>    
-                    <div class="column">
-                         <label class="label">Preço</label>
-                        <div class="control has-icons-left">
-                            <input class="input" type="number" step="0.01" id="show-preco" 
-                                onblur="this.value = parseFloat(this.value).toFixed(2)" required>
-                            <span class="icon is-small is-left">
-                                <i style="font-style: normal; font-size: 0.8rem; padding-left: 5px;">R$</i>
-                            </span>
                         </div>
-                    </div>
                         <div class="column">
-                            <label class="label">Categoria (ID)</label>
-                            <input class="input" type="number" id="show-categoryId" value="1" required>
+                            <label class="label">Preço</label>
+                            <div class="control has-icons-left">
+                                <input class="input" type="number" step="0.01" id="show-preco" onblur="this.value = parseFloat(this.value).toFixed(2)" required>
+                                <span class="icon is-small is-left">
+                                    <i style="font-style: normal; font-size: 0.8rem; padding-left: 5px;">R$</i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <label class="label">Categoria</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select id="show-categoryId" required>
+                                        <option value="">Carregando...</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="buttons is-right">
@@ -66,7 +87,9 @@
         <div class="container">
             <div class="navbar-brand"><a class="navbar-item"><strong> Painel Admin</strong></a></div>
             <div class="navbar-end">
-                <div class="navbar-item"><button onclick="logout()" class="button is-danger">Sair</button></div>
+                <div class="navbar-item">
+                    <button onclick="logout()" class="button is-danger">Sair</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -79,6 +102,7 @@
                     <ul class="menu-list">
                         <li><a id="link-shows" class="is-active" onclick="irParaShows()">Gerenciar Shows</a></li>
                         <li><a id="link-relatorios" onclick="mostrarRelatorios()">Relatórios Financeiros</a></li>
+                        <li><a id="link-categorias" onclick="mostrarCategorias()">Gerenciar Categorias</a></li>
                     </ul>
                 </aside>
             </div>
@@ -86,7 +110,9 @@
             <div class="column is-9">
                 <div id="container-shows">
                     <div class="level">
-                        <div class="level-left"><h1 class="title">Controle de Eventos</h1></div>
+                        <div class="level-left">
+                            <h1 class="title">Controle de Eventos</h1>
+                        </div>
                         <div class="level-right">
                             <button class="button is-success" onclick="abrirModalShow()">+ Novo Show</button>
                         </div>
@@ -104,7 +130,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="tabela-admin-shows"></tbody> 
+                            <tbody id="tabela-admin-shows"></tbody>
                         </table>
                     </div>
                 </div>
@@ -114,19 +140,20 @@
                     <div class="columns">
                         <div class="column">
                             <div class="notification is-link is-light">
-                                <p class="heading">Total Arrecadado</p>
+                                <p class="heading">Total Arrecadado (Aprovado)</p>
                                 <p class="title" id="total-receita">R$ 0,00</p>
                             </div>
                         </div>
                         <div class="column">
                             <div class="notification is-primary is-light">
-                                <p class="heading">Ingressos Vendidos</p>
+                                <p class="heading">Ingressos Vendidos (Aprovado)</p>
                                 <p class="title" id="total-ingressos">0</p>
                             </div>
                         </div>
                     </div>
+
                     <div class="box">
-                        <h2 class="subtitle">Vendas por Show</h2>
+                        <h2 class="subtitle">Vendas por Show (Aprovadas)</h2>
                         <table class="table is-fullwidth">
                             <thead>
                                 <tr>
@@ -138,13 +165,105 @@
                             <tbody id="tabela-relatorio-vendas"></tbody>
                         </table>
                     </div>
+
+                    <div class="box mt-6">
+                        <h2 class="subtitle has-text-warning">Reservas Pendentes</h2>
+                        <table class="table is-fullwidth is-striped is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Show</th>
+                                    <th>Qtd Reservada</th>
+                                    <th>Total Esperado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-relatorio-pendentes"></tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <div class="box mt-6">
+                        <h2 class="subtitle has-text-danger">Reservas Canceladas</h2>
+                        <table class="table is-fullwidth is-striped is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>Show</th>
+                                    <th>Qtd Cancelada</th>
+                                    <th>Total Perdido</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-relatorio-cancelados"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="container-categorias" style="display: none;">
+                    <div class="level">
+                        <div class="level-left">
+                            <h1 class="title">Categorias de Shows</h1>
+                        </div>
+                        <div class="level-right">
+                            <button class="button is-success" onclick="abrirModalCategoria()">+ Nova Categoria</button>
+                        </div>
+                    </div>
+                    <div class="box">
+                        <table class="table is-fullwidth is-striped is-hoverable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome da Categoria</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-categorias"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            </div>
+        </div>
     </section>
 
+    <div id="modal-categoria" class="modal">
+        <div class="modal-background" onclick="fecharModalCategoria()"></div>
+        <div class="modal-content">
+            <div class="box">
+                <h2 class="title is-4">Nova Categoria</h2>
+                <form id="form-categoria" onsubmit="salvarCategoria(event)">
+                    <div class="field">
+                        <label class="label">Nome da Categoria</label>
+                        <div class="control">
+                            <input class="input" type="text" id="categoria-nome" placeholder="Ex: Rock, Pop, Stand-up" required>
+                        </div>
+                    </div>
+                    <div class="buttons is-right">
+                        <button type="button" class="button" onclick="fecharModalCategoria()">Cancelar</button>
+                        <button type="submit" class="button is-primary">Salvar Categoria</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <button class="modal-close is-large" onclick="fecharModalCategoria()"></button>
+    </div>
+
+    <footer class="footer has-background-dark has-text-white">
+        <div class="container">
+            <div class="content has-text-centered">
+                <p>Sistema de Gestão de Eventos</p>
+                <p>
+                    Feito por
+                    <span class="has-text-info has-text-weight-bold">Akilan</span>
+                    e
+                    <span class="has-text-info has-text-weight-bold">Hevellyn</span>
+                </p>
+                <p class="is-size-7" style="opacity: 0.5;">
+                    © 2026 Todos os direitos reservados.
+                </p>
+            </div>
+        </div>
+    </footer>
+
     <script src="../js/api.js"></script>
-    <script src="../js/admin.js"></script> 
+    <script src="../js/admin.js"></script>
     <script>
         const role = localStorage.getItem('role');
         if (role !== 'ROLE_ADMIN') {
@@ -158,20 +277,32 @@
         }
 
         function abrirModalShow() {
-        const campoId = document.getElementById('show-id');
-        if (campoId) {
-            campoId.value = ''; 
-        }
-        const formulario = document.getElementById('form-show');
-        if (formulario) {
-            formulario.reset();
-        }
-        document.getElementById('modal-show').classList.add('is-active');
+            const campoId = document.getElementById('show-id');
+            const tituloModal = document.querySelector('#modal-show .title');
+
+            if (!campoId.value) {
+                if (tituloModal) tituloModal.innerText = "Configurar Show";
+                const formulario = document.getElementById('form-show');
+                if (formulario) formulario.reset();
+            } else {
+                if (tituloModal) tituloModal.innerText = "Editar Show";
             }
+
+            document.getElementById('modal-show').classList.add('is-active');
+        }
 
         function fecharModal() {
             document.getElementById('modal-show').classList.remove('is-active');
             document.getElementById('form-show').reset();
+        }
+
+        function abrirModalCategoria() {
+            document.getElementById('modal-categoria').classList.add('is-active');
+        }
+
+        function fecharModalCategoria() {
+            document.getElementById('modal-categoria').classList.remove('is-active');
+            document.getElementById('form-categoria').reset();
         }
     </script>
 </body>
